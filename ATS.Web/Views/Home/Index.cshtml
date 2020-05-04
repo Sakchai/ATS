@@ -1,0 +1,134 @@
+﻿@model PersonAccessViewModel
+@{
+    ViewData["Title"] = "Access Thermal Checking";
+}
+
+
+<form>
+
+    <table>
+        <tbody>
+            <tr>
+                <td class="align-baseline">
+                    <div class="form-row">
+                        <div class="form-group col-md-11">
+                            <label for="inputBuilding">Select Building to Monitor</label>
+
+                            <select class="form-control" id="inputBuilding" required asp-for="BuildingId">
+                                @foreach (var b in Model.Buildings)
+                                {
+                                    <option selected="@b.Selected" value="@b.Value">@b.Text</option>
+                                }
+                            </select>
+
+
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-11">
+                            <label for="inputStartTime">Date & Time Start</label>
+                            <div class='input-group date' id='inputStartTime'>
+                                <input type='text' class="form-control" asp-for="StartTime" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-11">
+                            <label for="inputEndTime">Date & Time Until</label>
+                            <div class='input-group date' id='inputEndTime'>
+                                <input type='text' class="form-control" asp-for="EndTime" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="align-center">
+                    <div id="chart-container">
+                        <canvas id="doughnutChart" width="95" height="130"></canvas>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Refresh</button>
+
+    <table>
+        <tbody>
+            <tr>
+                <td class="align-center">
+                    <img src="~/images/walker.jpg" width="130" height="270" alt="">
+                </td>
+                <td class="align-baseline">
+
+                    <div class="row">
+                        <h3>Access in Building</h3>
+                    </div>
+                    <div class="form-row">
+                        <div class="d-flex flex-nowrap">
+                            <div class="order-1 p-2"><h1 class="font-weight-bold">@Model.TotalValue</h1></div>
+                            <div class="order-2 p-2 align-self-center">person</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="d-flex flex-nowrap">
+                            <div class="order-1 p-2"><h1 class="text-success">@Model.PassedValue</h1></div>
+                            <div class="order-2 p-2 align-self-center">person</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="d-flex flex-nowrap">
+                            <div class="order-1 p-2"><h1 class="text-danger">@Model.FailedValue</h1></div>
+                            <div class="order-2 p-2 align-self-center">person</div>
+                        </div>
+                    </div>
+
+                </td>
+
+            </tr>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#inputStartTime').datetimepicker();
+            $('#inputEndTime').datetimepicker();
+        });
+
+        var doughnutChart = document.getElementById('doughnutChart').getContext('2d');
+
+        var myDoughnutChart = new Chart(doughnutChart, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [@Model.Passed, @Model.Failed],
+                    backgroundColor: ['#008000', '#FF0000']
+                }],
+
+                labels: [
+                    '@Model.PercentPass%Pass'
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    position: 'bottom'
+                },
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 1,
+                        top: 1,
+                        bottom: 1
+                    }
+                }
+            }
+        });
+    </script>
+</form>
+
