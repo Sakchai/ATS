@@ -7,37 +7,55 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ATS.Web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ATS.Services;
+using ATS.Model;
 
 namespace ATS.Web.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IPersonTrackingService _personTrackingService;
+        public HomeController(ILogger<HomeController> logger,
+            IPersonTrackingService personTrackingService)
         {
             _logger = logger;
+            _personTrackingService = personTrackingService;
         }
 
-        public IActionResult Index(PersonAccessViewModel persons)
+        public IActionResult Index(PersonAccessViewModel pModel)
         {
-            if (persons.TotalValue == null)
+            if (pModel.StartTime.Year == 1)
+                pModel.StartTime = DateTime.Today;
+            if (pModel.EndTime.Year == 1)
+                pModel.EndTime = DateTime.Now;
+            pModel.BuildingId = (pModel.BuildingId == 0) ? pModel.BuildingId = 1 : pModel.BuildingId;
+            var pTracking = _personTrackingService.GetPersonTrackingByBuilding(pModel.BuildingId, pModel.StartTime, pModel.EndTime);
+            pModel.NumberFail = (pTracking != null) ? pTracking.NumberFail : 0;
+            pModel.NumberPass = (pTracking != null) ? pTracking.NumberPass : 0;
+            pModel.FailedValue = (pTracking != null) ? pTracking.NumberFail.ToString("N") : "0";
+            pModel.PassedValue = (pTracking != null) ? pTracking.NumberPass.ToString("N") : "0";
+            pModel.TotalValue = (pTracking != null) ? pTracking.NumberTotal.ToString("N") : "0";
+            float pass = (pTracking != null && pTracking.NumberTotal > 0) ? pTracking.NumberPass / pTracking.NumberTotal * 100 : 0;
+            pModel.PercentPass = pass.ToString("N1");
+
+            List<SelectListItem> lists = GetBuildings(pModel.BuildingId);
+            pModel.Buildings = lists;
+            return View(pModel);
+        }
+
+        private List<SelectListItem> GetBuildings(int buildingId)
+        {
+            var lists = new List<SelectListItem>();
+            foreach (var item in _personTrackingService.GetBuildings())
             {
-                persons.Failed = 147;
-                persons.Passed = 1607;
-                persons.FailedValue = "147";
-                persons.PassedValue = "1,607";
-                persons.TotalValue = "1,754";
-                persons.PercentPass = "91.6";
-                persons.StartTime = DateTime.Today;
-                persons.EndTime = DateTime.Now;
-                persons.BuildingId = 1;
-                var lists = new List<SelectListItem>();
-                lists.Add(new SelectListItem { Selected = true, Text = "Building A", Value = "1" });
-                lists.Add(new SelectListItem { Selected = false, Text = "Building B", Value = "2" });
-                persons.Buildings = lists;
-            } 
-            return View(persons);
+                if (item.Id == buildingId)
+                    lists.Add(new SelectListItem { Selected = true, Text = item.Name, Value = item.Id.ToString() });
+                else
+                    lists.Add(new SelectListItem { Selected = false, Text = item.Name, Value = item.Id.ToString() });
+            }
+
+            return lists;
         }
 
         public IActionResult Privacy()

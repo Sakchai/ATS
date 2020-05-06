@@ -13,8 +13,8 @@ namespace ATS.Web.Models
         public string FailedValue { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public int Passed { get; set; }
-        public int Failed { get; set; }
+        public int NumberPass { get; set; }
+        public int NumberFail { get; set; }
         public string PercentPass { get; set; }
         public int BuildingId { get; set; }
         public List<SelectListItem> Buildings { get; set; }

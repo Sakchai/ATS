@@ -61,7 +61,7 @@
         <tbody>
             <tr>
                 <td class="align-center">
-                    <img src="~/images/walker.jpg" width="130" height="270" alt="">
+                    <img src="~/images/walker.jpg" width="130" height="290" alt="">
                 </td>
                 <td class="align-baseline">
 
@@ -76,13 +76,13 @@
                     </div>
                     <div class="form-row">
                         <div class="d-flex flex-nowrap">
-                            <div class="order-1 p-2"><h1 class="text-success">@Model.PassedValue</h1></div>
+                            <div class="order-1 p-2"><h1 class="text-success font-weight-bold">@Model.PassedValue</h1></div>
                             <div class="order-2 p-2 align-self-center">person</div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="d-flex flex-nowrap">
-                            <div class="order-1 p-2"><h1 class="text-danger">@Model.FailedValue</h1></div>
+                            <div class="order-1 p-2"><h1 class="text-danger font-weight-bold">@Model.FailedValue</h1></div>
                             <div class="order-2 p-2 align-self-center">person</div>
                         </div>
                     </div>
@@ -105,7 +105,7 @@
             type: 'doughnut',
             data: {
                 datasets: [{
-                    data: [@Model.Passed, @Model.Failed],
+                    data: [@Model.NumberPass, @Model.NumberFail],
                     backgroundColor: ['#008000', '#FF0000']
                 }],
 
