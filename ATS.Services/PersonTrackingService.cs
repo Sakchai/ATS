@@ -126,6 +126,20 @@ namespace ATS.Services
             return query.OrderBy(x => x.Name).ToList();
         }
 
+        public PersonAccess GetPersonTrackingByTranDate(int buildingId, DateTime tranDate)
+        {
+            if (buildingId == 0)
+                return null;
+
+            if (tranDate == null)
+                return null;
+
+            var query = _personRepository.Table;
+            query = query.Where(x => x.BuildingId == buildingId);
+
+            return query.Where(x => x.TranDate == tranDate).FirstOrDefault();
+        }
+
 
 
         #endregion

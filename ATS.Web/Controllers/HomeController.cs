@@ -1,14 +1,11 @@
-﻿using System;
+﻿using ATS.Services;
+using ATS.Web.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using ATS.Web.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using ATS.Services;
-using ATS.Model;
 
 namespace ATS.Web.Controllers
 {
@@ -33,10 +30,10 @@ namespace ATS.Web.Controllers
             var pTracking = _personTrackingService.GetPersonTrackingByBuilding(pModel.BuildingId, pModel.StartTime, pModel.EndTime);
             pModel.NumberFail = (pTracking != null) ? pTracking.NumberFail : 0;
             pModel.NumberPass = (pTracking != null) ? pTracking.NumberPass : 0;
-            pModel.FailedValue = (pTracking != null) ? pTracking.NumberFail.ToString("N") : "0";
-            pModel.PassedValue = (pTracking != null) ? pTracking.NumberPass.ToString("N") : "0";
-            pModel.TotalValue = (pTracking != null) ? pTracking.NumberTotal.ToString("N") : "0";
-            float pass = (pTracking != null && pTracking.NumberTotal > 0) ? pTracking.NumberPass / pTracking.NumberTotal * 100 : 0;
+            pModel.FailedValue = (pTracking != null) ? pTracking.NumberFail.ToString("N0") : "0";
+            pModel.PassedValue = (pTracking != null) ? pTracking.NumberPass.ToString("N0") : "0";
+            pModel.TotalValue = (pTracking != null) ? pTracking.NumberTotal.ToString("N0") : "0";
+            decimal pass = (pTracking != null && pTracking.NumberTotal > 0) ? ((decimal)pTracking.NumberPass * 100)/ (decimal)pTracking.NumberTotal : 0;
             pModel.PercentPass = pass.ToString("N1");
 
             List<SelectListItem> lists = GetBuildings(pModel.BuildingId);
