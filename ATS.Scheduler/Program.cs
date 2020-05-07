@@ -28,7 +28,9 @@ namespace ATS.Scheduler
 
                 var personTracker = new PersonTracker(container, personService);
 
+                
                 personTracker.Create();
+
 
             }
         }

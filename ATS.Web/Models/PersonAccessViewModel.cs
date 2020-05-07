@@ -17,6 +17,7 @@ namespace ATS.Web.Models
         public int NumberFail { get; set; }
         public string PercentPass { get; set; }
         public int BuildingId { get; set; }
+        public string InvalidLicenseKey { get; set; }
         public List<SelectListItem> Buildings { get; set; }
     }
 }

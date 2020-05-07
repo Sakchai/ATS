@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LinqToDB.Mapping;
+using System;
 
 
 namespace ATS.Model
@@ -11,7 +12,7 @@ namespace ATS.Model
         /// <summary>
         /// Gets or sets the entity identifier
         /// </summary>
-        public int Id { get; set; }
+        public virtual int Id { get; set; }
 
         /// <summary>
         /// Get key for caching the entity

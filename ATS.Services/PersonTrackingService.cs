@@ -123,6 +123,7 @@ namespace ATS.Services
         public List<Building> GetBuildings()
         {
             var query = _buildingRepository.Table;
+            query = query.Where(x => x.IsActive == true);
             return query.OrderBy(x => x.Name).ToList();
         }
 

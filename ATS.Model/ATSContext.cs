@@ -33,7 +33,7 @@ namespace ATS.Model
             {
                 entity.ToTable("Building");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.IsActive)
                     .IsRequired()
@@ -52,7 +52,7 @@ namespace ATS.Model
             modelBuilder.Entity<PersonAccess>(entity =>
             {
                 entity.ToTable("PersonAccess");
-
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.TranDate).HasColumnType("datetime");
             });
 

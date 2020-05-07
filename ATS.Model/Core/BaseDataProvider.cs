@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
@@ -107,7 +108,6 @@ namespace ATS.Model
             using (var dataContext = CreateDataConnection())
             {
                 entity.Id = dataContext.InsertWithInt32Identity(entity);
-                //entity.Id = Guid.NewGuid().ToString();
                 return entity;
             }
         }
@@ -307,7 +307,7 @@ namespace ATS.Model
         /// Database connection string
         /// </summary>
         //protected string CurrentConnectionString => DataSettingsManager.LoadSettings().ConnectionString;
-        protected string CurrentConnectionString => "Data Source=.;Initial Catalog=FAAD2;Integrated Security=True";
+        protected string CurrentConnectionString => ConfigurationManager.AppSettings["ConnectionString"];
 
         /// <summary>
         /// Name of database provider
