@@ -8,7 +8,7 @@ namespace ATS.Scheduler
 {
     class Program
     {
-        static void Main(string[] args)
+        static async System.Threading.Tasks.Task Main(string[] args)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<BaseDataProvider>().AsImplementedInterfaces().InstancePerLifetimeScope();
@@ -28,8 +28,7 @@ namespace ATS.Scheduler
 
                 var personTracker = new PersonTracker(container, personService);
 
-                
-                personTracker.Create();
+                await personTracker.CreateAsync();
 
 
             }

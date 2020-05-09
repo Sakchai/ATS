@@ -8,13 +8,14 @@ namespace ATS.Web.Models
 {
     public class PersonAccessViewModel
     {
-        public string TotalValue { get; set; }
-        public string PassedValue { get; set; }
-        public string FailedValue { get; set; }
+        public string TotalValue => NumberTotal.ToString("N0");
+        public string PassedValue => NumberPass.ToString("N0");
+        public string FailedValue => NumberFail.ToString("N0");
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public int NumberPass { get; set; }
         public int NumberFail { get; set; }
+        public int NumberTotal => NumberPass + NumberFail;
         public string PercentPass { get; set; }
         public int BuildingId { get; set; }
         public string InvalidLicenseKey { get; set; }

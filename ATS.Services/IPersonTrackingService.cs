@@ -16,6 +16,8 @@ namespace ATS.Services
         /// <returns>PersonTracking</returns>
         PersonAccess GetPersonTrackingByBuilding(int buildingId, DateTime startTime, DateTime endTime);
         PersonAccess GetPersonTrackingByTranDate(int buildingId, DateTime tranDate);
+        PersonAccess GetLastPersonTracking(int buildingId);
+
         List<Building> GetBuildings();
         /// <summary>
         /// Marks person as deleted 

@@ -13,6 +13,8 @@ namespace ATS.Model
         public int NumberPass { get; set; }
         public int NumberFail { get; set; }
         public int NumberTotal { get; set; }
+        public int RemainPass { get; set; }
+        public int RemainFail { get; set; }
         public int? BuildingId { get; set; }
 
     }

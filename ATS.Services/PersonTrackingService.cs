@@ -38,7 +38,7 @@ namespace ATS.Services
         /// <returns>PersonTracking</returns>
         public virtual PersonAccess GetPersonTrackingByBuilding(int buildingId, DateTime startTime, DateTime endTime)
         {
-            if (buildingId ==0)
+            if (buildingId == 0)
                 return null;
 
             if (startTime == null)
@@ -53,36 +53,25 @@ namespace ATS.Services
             if (endTime != null)
                 query = query.Where(x => x.TranDate <= endTime);
 
-            var ps = query.OrderBy(x => x.TranDate).ToList();
-            
+            var ps = query.ToList();
+
             if (ps.Count == 0)
                 return null;
 
-            var p1 = ps.FirstOrDefault();
-            var p2 = ps.LastOrDefault();
+            int pass = ps.Sum(x => x.RemainPass);
+            int fail = ps.Sum(x => x.RemainFail);
 
-            if (p1.TranDate == p2.TranDate)
-                return p1;
-            else if (p1.TranDate < p2.TranDate)
+            return new PersonAccess
             {
-                int fail = p2.NumberFail - p1.NumberFail + 1;
-                int pass = p2.NumberPass - p1.NumberPass + 1;
-                return new PersonAccess
-                {
-                    BuildingId = buildingId,
-                    Id = p2.Id,
-                    NumberFail = fail,
-                    NumberPass = pass,
-                    NumberTotal = pass + fail,
-                    TranDate = DateTime.Now
-                };
-            }
-            else
-                return p2;
+                BuildingId = buildingId,
+                NumberFail = fail,
+                NumberPass = pass,
+                TranDate = DateTime.Now
+            };
 
         }
 
-      
+
         /// <summary>
         /// Marks person as deleted 
         /// </summary>
@@ -139,6 +128,17 @@ namespace ATS.Services
             query = query.Where(x => x.BuildingId == buildingId);
 
             return query.Where(x => x.TranDate == tranDate).FirstOrDefault();
+        }
+
+        public PersonAccess GetLastPersonTracking(int buildingId)
+        {
+            if (buildingId == 0)
+                return null;
+
+            var query = _personRepository.Table;
+            query = query.Where(x => x.BuildingId == buildingId);
+
+            return query.OrderByDescending(x => x.Id).FirstOrDefault();
         }
 
 
