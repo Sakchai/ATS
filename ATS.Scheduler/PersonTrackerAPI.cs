@@ -102,14 +102,19 @@ namespace ATS.Scheduler
             return response.Headers.Location;
         }
 
-        private async Task UpdatePersonAccessAsync(PersonAccess p)
+        private async Task<PersonAccess> UpdatePersonAccessAsync(PersonAccess p)
         {
             string uri = $"{ConfigurationManager.AppSettings["BaseAddress"]}/api/PersonTracking";
             HttpResponseMessage response = await client
                 .PutAsync(uri, new StringContent(JsonConvert.SerializeObject(p), Encoding.UTF8, "application/json"));
             response.EnsureSuccessStatusCode();
-
-
+            PersonAccess person = null;
+            if (response.IsSuccessStatusCode && !response.ReasonPhrase.Equals("No Content"))
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                person = JsonConvert.DeserializeObject<PersonAccess>(json);
+            }
+            return person;
         }
 
         private async Task<PersonAccess> GetPersonTrackingByTranDate(int buildingId, string tranDate)
@@ -118,7 +123,10 @@ namespace ATS.Scheduler
             PersonAccess person = null;
             HttpResponseMessage response = await client.GetAsync(path);
             if (response.IsSuccessStatusCode && !response.ReasonPhrase.Equals("No Content"))
-                person = await response.Content.ReadAsAsync<PersonAccess>();
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                person = JsonConvert.DeserializeObject<PersonAccess>(json);
+            }
 
             return person;
         }
