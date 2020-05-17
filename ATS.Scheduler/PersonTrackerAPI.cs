@@ -83,6 +83,7 @@ namespace ATS.Scheduler
                     string ocrString = StartOCR(currentFile);
                     //await CreateOrUpdatePersonAccessAPI(buildingId, currentFile);
                     DateTime tranDate = File.GetCreationTime(currentFile);
+                    log.Info($"FileName:{Path.GetFileName(currentFile)},Tran Date:{tranDate}, OCR:{ocrString}");
                     await CreateOrUpdatePersonAccessAPIV2(buildingId, ocrString, tranDate);
 
                     string fileName = currentFile.Substring(sourceDirectory.Length + 1);
