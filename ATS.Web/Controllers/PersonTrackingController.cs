@@ -64,8 +64,8 @@ namespace ATS.Web.Controllers
                 if (p.Total > lastPerson.NumberTotal)
                 {
                     remainTotal = p.Total - lastPerson.NumberTotal;
-                    remainFail = p.Failed - lastPerson.NumberPass;
-                    remainPass = remainTotal - remainFail;
+                    remainFail = p.Failed - lastPerson.NumberFail;
+                    remainPass = p.Total - p.Failed - lastPerson.NumberPass; 
                 }
                 else
                 {

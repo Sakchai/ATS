@@ -39,7 +39,7 @@ namespace ATS.Scheduler
             {
                 var personTracker = new PersonTrackerAPI();
 
-                await personTracker.CreateAsync();
+                await personTracker.CreateV2Async();
             }
         }
 

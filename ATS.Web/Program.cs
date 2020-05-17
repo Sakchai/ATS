@@ -24,7 +24,7 @@ namespace ATS.Web
                 webHostBuilder
                         .UseContentRoot(Directory.GetCurrentDirectory())
                         .UseIISIntegration()
-                 //       .UseUrls("http://*:80", "https://*:443")
+                        .UseUrls("http://*:80")
                         .UseStartup<Startup>();
             })
             .Build();

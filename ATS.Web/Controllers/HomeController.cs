@@ -46,8 +46,8 @@ namespace ATS.Web.Controllers
             //pModel.FailedValue = (pTracking != null) ? pTracking.NumberFail.ToString("N0") : "0";
             //pModel.PassedValue = (pTracking != null) ? pTracking.NumberPass.ToString("N0") : "0";
             //pModel.TotalValue = (pTracking != null) ? pTracking.NumberTotal.ToString("N0") : "0";
-            decimal pass = (pTracking != null && pTracking.NumberTotal > 0) ? ((decimal)pTracking.NumberPass * 100) / (decimal)pTracking.NumberTotal : 0;
-            pModel.PercentPass = pass.ToString("N1");
+            //decimal pass = (pTracking != null && pTracking.NumberTotal > 0) ? ((decimal)pTracking.NumberPass * 100) / (decimal)pTracking.NumberTotal : 0;
+            //pModel.PercentPass = pass.ToString("N1");
 
             List<SelectListItem> lists = GetBuildings(pModel.BuildingId);
             pModel.Buildings = lists;

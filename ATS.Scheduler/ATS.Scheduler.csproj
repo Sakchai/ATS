@@ -18,6 +18,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Greenshot.ImageEditor">
+      <HintPath>Lib\Greenshot.ImageEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.IWshRuntimeLibrary">
+      <HintPath>Lib\Interop.IWshRuntimeLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.Shell32">
+      <HintPath>Lib\Interop.Shell32.dll</HintPath>
+    </Reference>
+    <Reference Include="Security.Cryptography">
+      <HintPath>Lib\Security.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="ShareX.HelpersLib">
+      <HintPath>Lib\ShareX.HelpersLib.dll</HintPath>
+    </Reference>
+    <Reference Include="ShareX.UploadersLib">
+      <HintPath>Lib\ShareX.UploadersLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

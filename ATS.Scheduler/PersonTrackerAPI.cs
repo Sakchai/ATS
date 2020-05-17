@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ATS.Dto;
 using Newtonsoft.Json;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace ATS.Scheduler
 {
@@ -42,6 +44,46 @@ namespace ATS.Scheduler
                 {
 
                     await CreateOrUpdatePersonAccessAPI(buildingId, currentFile);
+
+                    string fileName = currentFile.Substring(sourceDirectory.Length + 1);
+                    if (!Directory.Exists(archiveDirectory))
+                        Directory.CreateDirectory(archiveDirectory);
+                    string desFile = Path.Combine(archiveDirectory, fileName);
+                    if (File.Exists(desFile))
+                        File.Delete(desFile);
+                    Directory.Move(currentFile, desFile);
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e.Message);
+            }
+        }
+
+        public IEnumerable<string> GetFiles(string path, string searchPatterns, SearchOption searchOptions = SearchOption.TopDirectoryOnly)
+        {
+            DirectoryInfo dir = new DirectoryInfo(path);
+            var dirs = (from file in dir.EnumerateFiles(searchPatterns, searchOptions)
+                        orderby file.CreationTime ascending
+                        select file.Name).Distinct(); // Don't need <string> here, since it's implied
+            return dirs;
+        }
+
+        public async Task CreateV2Async()
+        {
+            try
+            {
+                string sourceDirectory = ConfigurationManager.AppSettings["currentPath"];
+                string archiveDirectory = ConfigurationManager.AppSettings["archivePath"];
+                int buildingId = Int32.Parse(ConfigurationManager.AppSettings["buildingId"]);
+                //var txtFiles = Directory.EnumerateFiles(sourceDirectory, "*.jpg", SearchOption.AllDirectories);
+                var txtFiles = GetFiles(sourceDirectory, "*.jpg");
+                foreach (string currentFile in txtFiles)
+                {
+                    string ocrString = StartOCR(currentFile);
+                    //await CreateOrUpdatePersonAccessAPI(buildingId, currentFile);
+                    DateTime tranDate = File.GetCreationTime(currentFile);
+                    await CreateOrUpdatePersonAccessAPIV2(buildingId, ocrString, tranDate);
 
                     string fileName = currentFile.Substring(sourceDirectory.Length + 1);
                     if (!Directory.Exists(archiveDirectory))
@@ -90,6 +132,57 @@ namespace ATS.Scheduler
             }
         }
 
+        private async Task CreateOrUpdatePersonAccessAPIV2(int buildingId, string ocrString, DateTime creationDate)
+        {
+            var ocrs = ocrString.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            int total = Int32.Parse(ocrs[0]);
+            int failed = Int32.Parse(ocrs[2]);
+            string tranDate = creationDate.ToString("yyyyMMddHHmmss");
+            var personTran = await GetPersonTrackingByTranDate(buildingId, tranDate);
+
+            if (personTran != null)
+            {
+                personTran.NumberFail = failed;
+                personTran.NumberTotal = total;
+                await UpdatePersonAccessAsync(personTran);
+            }
+            else
+            {
+                var personAccessDto = new PersonAccessDto
+                {
+                    BuildingId = buildingId,
+                    Total = total,
+                    Failed = failed,
+                    TranDate = creationDate
+                };
+                await CreatePersonAccessAsync(personAccessDto);
+            }
+
+        }
+
+        private string StartOCR(string Filename)
+        {
+            using (Stream sr = File.Open(Filename, FileMode.Open))
+            {
+                try
+                {
+                    OCRSpace ocr = new OCRSpace();
+                    OCRSpaceResponse response = ocr.DoOCR(sr, Filename);
+
+                    if (response != null && !response.IsErroredOnProcessing && response.ParsedResults.Count > 0)
+                    {
+                        return response.ParsedResults[0].ParsedText;
+                    }
+                }
+                catch (Exception e)
+                {
+                    log.Error(e.Message);
+                }
+            }
+            return string.Empty;
+        }
+
+
         private async Task<Uri> CreatePersonAccessAsync(PersonAccessDto p)
         {
             string uri = $"{ConfigurationManager.AppSettings["BaseAddress"]}/api/PersonTracking";
@@ -131,7 +224,7 @@ namespace ATS.Scheduler
             return person;
         }
 
-   
+
         private DateTime GetTranDate(string currentFile)
         {
             string dateString = Path.GetFileNameWithoutExtension(currentFile);
