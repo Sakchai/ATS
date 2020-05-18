@@ -73,15 +73,17 @@ namespace ATS.Scheduler
 
         public OCRSpaceResponse DoOCR(Stream stream, string fileName)
         {
+
             string APIURL = ConfigurationManager.AppSettings["APIURL"];
             Dictionary<string, string> arguments = new Dictionary<string, string>();
-            //arguments.Add("apikey", APIKeys.OCRSpaceAPIKey);
             arguments.Add("apikey", ConfigurationManager.AppSettings["APIKey"]);
-            //arguments.Add("url", "");
+            string name = Path.GetFileName(fileName);
+            arguments.Add("filetype", ConfigurationManager.AppSettings["ImageType"]);
             arguments.Add("language", Language.ToString());
-            arguments.Add("isOverlayRequired", Overlay.ToString());
-
-            UploadResult ur = UploadData(stream, APIURL, fileName, "file", arguments);
+            arguments.Add("isOverlayRequired", "False");
+            arguments.Add("isCreateSearchablePdf", "False");
+            
+            UploadResult ur = UploadData(stream, APIURL, name, "file", arguments);
 
             if (ur.IsSuccess)
             {

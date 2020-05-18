@@ -65,7 +65,7 @@ namespace ATS.Scheduler
             DirectoryInfo dir = new DirectoryInfo(path);
             var dirs = (from file in dir.EnumerateFiles(searchPatterns, searchOptions)
                         orderby file.CreationTime ascending
-                        select file.Name).Distinct(); // Don't need <string> here, since it's implied
+                        select file.FullName).Distinct(); // Don't need <string> here, since it's implied
             return dirs;
         }
 
@@ -76,15 +76,20 @@ namespace ATS.Scheduler
                 string sourceDirectory = ConfigurationManager.AppSettings["currentPath"];
                 string archiveDirectory = ConfigurationManager.AppSettings["archivePath"];
                 int buildingId = Int32.Parse(ConfigurationManager.AppSettings["buildingId"]);
-                //var txtFiles = Directory.EnumerateFiles(sourceDirectory, "*.jpg", SearchOption.AllDirectories);
-                var txtFiles = GetFiles(sourceDirectory, "*.jpg");
+
+                string searchPatterns = $"*.{ConfigurationManager.AppSettings["ImageType"]}";
+                var txtFiles = GetFiles(sourceDirectory, searchPatterns);
                 foreach (string currentFile in txtFiles)
                 {
                     string ocrString = StartOCR(currentFile);
-                    //await CreateOrUpdatePersonAccessAPI(buildingId, currentFile);
+                    ocrString = ocrString.Replace("Warnings", string.Empty);
+                    ocrString = ocrString.Replace(Environment.NewLine, " ");
+                    ocrString = ocrString.Replace("  ",",");
                     DateTime tranDate = File.GetCreationTime(currentFile);
                     log.Info($"FileName:{Path.GetFileName(currentFile)},Tran Date:{tranDate}, OCR:{ocrString}");
-                    await CreateOrUpdatePersonAccessAPIV2(buildingId, ocrString, tranDate);
+
+                    if (!string.IsNullOrWhiteSpace(ocrString))  
+                        await CreateOrUpdatePersonAccessAPIV2(buildingId, ocrString, tranDate);
 
                     string fileName = currentFile.Substring(sourceDirectory.Length + 1);
                     if (!Directory.Exists(archiveDirectory))
@@ -93,6 +98,7 @@ namespace ATS.Scheduler
                     if (File.Exists(desFile))
                         File.Delete(desFile);
                     Directory.Move(currentFile, desFile);
+
                 }
             }
             catch (Exception e)
@@ -135,9 +141,15 @@ namespace ATS.Scheduler
 
         private async Task CreateOrUpdatePersonAccessAPIV2(int buildingId, string ocrString, DateTime creationDate)
         {
-            var ocrs = ocrString.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var ocrs = ocrString.Split(",", StringSplitOptions.RemoveEmptyEntries);
+            if (ocrs.Length != 2)
+            {
+                log.Error($"Invalid OCR string:{ocrString} length not equal 2 arrays.");
+                return;
+            }
             int total = Int32.Parse(ocrs[0]);
-            int failed = Int32.Parse(ocrs[2]);
+            int failed = Int32.Parse(ocrs[1]);
+
             string tranDate = creationDate.ToString("yyyyMMddHHmmss");
             var personTran = await GetPersonTrackingByTranDate(buildingId, tranDate);
 
