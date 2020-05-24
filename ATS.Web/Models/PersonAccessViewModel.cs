@@ -16,7 +16,7 @@ namespace ATS.Web.Models
         public int NumberPass { get; set; }
         public int NumberFail { get; set; }
         public int NumberTotal => NumberPass + NumberFail;
-        public string PercentPass => NumberTotal > 0 ? $"{NumberPass * 100 / NumberTotal}" : "";
+        public string PercentPass => NumberTotal > 0 ? $"{((decimal)NumberPass * 100 / NumberTotal).ToString("N1")}" : "";
         public int BuildingId { get; set; }
         public string InvalidLicenseKey { get; set; }
         public List<SelectListItem> Buildings { get; set; }

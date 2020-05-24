@@ -74,6 +74,8 @@ namespace ATS.Scheduler
             try
             {
                 string sourceDirectory = ConfigurationManager.AppSettings["currentPath"];
+                string[] invaild = ConfigurationManager.AppSettings["InvaildText"].Split(',');
+
                 string archiveDirectory = ConfigurationManager.AppSettings["archivePath"];
                 int buildingId = Int32.Parse(ConfigurationManager.AppSettings["buildingId"]);
 
@@ -82,10 +84,16 @@ namespace ATS.Scheduler
                 foreach (string currentFile in txtFiles)
                 {
                     string ocrString = StartOCR(currentFile);
-                    ocrString = ocrString.Replace("Warnings", string.Empty);
+                    for (int i = 0; i < invaild.Length; i++)
+                    {
+                        ocrString = ocrString.Replace(invaild[i], string.Empty);
+                    }
                     ocrString = ocrString.Replace(Environment.NewLine, " ");
-                    ocrString = ocrString.Replace("  ",",");
+                    ocrString = ocrString.Replace("  ", ",");
+                    ocrString = ocrString.Trim();
+                    ocrString = ocrString.Replace(" ", ",");
                     DateTime tranDate = File.GetCreationTime(currentFile);
+                    tranDate = tranDate.AddTicks(-(tranDate.Ticks % TimeSpan.TicksPerSecond));
                     log.Info($"FileName:{Path.GetFileName(currentFile)},Tran Date:{tranDate}, OCR:{ocrString}");
 
                     if (!string.IsNullOrWhiteSpace(ocrString))  
@@ -142,13 +150,22 @@ namespace ATS.Scheduler
         private async Task CreateOrUpdatePersonAccessAPIV2(int buildingId, string ocrString, DateTime creationDate)
         {
             var ocrs = ocrString.Split(",", StringSplitOptions.RemoveEmptyEntries);
-            if (ocrs.Length != 2)
+            int total = 0;
+            int failed = 0;
+
+            switch (ocrs.Length)
             {
-                log.Error($"Invalid OCR string:{ocrString} length not equal 2 arrays.");
-                return;
+                case 1:
+                    total = Int32.Parse(ocrs[0]);
+                    break;
+                case 2:
+                    total = Int32.Parse(ocrs[0]);
+                    failed = Int32.Parse(ocrs[1]);
+                    break;
+                default:
+                    log.Error($"Invalid OCR string:{ocrString}.");
+                    return;
             }
-            int total = Int32.Parse(ocrs[0]);
-            int failed = Int32.Parse(ocrs[1]);
 
             string tranDate = creationDate.ToString("yyyyMMddHHmmss");
             var personTran = await GetPersonTrackingByTranDate(buildingId, tranDate);

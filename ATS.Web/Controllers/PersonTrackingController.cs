@@ -49,7 +49,7 @@ namespace ATS.Web.Controllers
         [HttpPost]
         public IActionResult Post(PersonAccessDto p)
         {
-            if ((p.BuildingId == 0) || (p.Total == 0) || (p.Failed == 0) || (p.TranDate.Year == 1))
+            if ((p.BuildingId == 0) || (p.Total == 0) || (p.TranDate.Year == 1))
             {
                 return BadRequest();
             }

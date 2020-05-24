@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Autofac.Extensions.DependencyInjection;
 using System.IO;
+using Microsoft.Extensions.Hosting.WindowsServices;
 
 namespace ATS.Web
 {
@@ -18,6 +19,7 @@ namespace ATS.Web
             //CreateHostBuilder(args).Build().Run();
 
             var host = Host.CreateDefaultBuilder(args)
+            .UseWindowsService()
             .UseServiceProviderFactory(new AutofacServiceProviderFactory())
             .ConfigureWebHostDefaults(webHostBuilder =>
             {
