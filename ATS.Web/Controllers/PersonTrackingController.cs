@@ -92,7 +92,7 @@ namespace ATS.Web.Controllers
             };
 
             if (lastPerson.Equals(person))
-                _logger.LogInformation($"Equal previous record BuildingId:{p.BuildingId},NumberPass:{p.Total - p.Failed},NumberFail:{p.Failed},TranDate:{person.TranDate.ToLongDateString()}");
+                _logger.LogWarning($"Equal previous record BuildingId:{p.BuildingId},NumberPass:{p.Total - p.Failed},NumberFail:{p.Failed},TranDate:{person.TranDate.ToLongDateString()}");
             else
             {
                 _logger.LogInformation($"Insert BuildingId:{p.BuildingId},NumberPass:{p.Total - p.Failed},NumberFail:{p.Failed},TranDate:{person.TranDate.ToLongDateString()}");

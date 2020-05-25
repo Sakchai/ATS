@@ -20,6 +20,28 @@ namespace ATS.Web
 
             var host = Host.CreateDefaultBuilder(args)
             .UseWindowsService()
+            .ConfigureLogging(logging =>
+            {
+                logging.AddFilter((provider, category, logLevel) =>
+                {
+                    if (provider.Contains("ConsoleLoggerProvider")
+                        && category.Contains("Controller")
+                        && logLevel >= LogLevel.Information)
+                    {
+                        return true;
+                    }
+                    else if (provider.Contains("ConsoleLoggerProvider")
+                        && category.Contains("Microsoft")
+                        && logLevel >= LogLevel.Information)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                });
+            })
             .UseServiceProviderFactory(new AutofacServiceProviderFactory())
             .ConfigureWebHostDefaults(webHostBuilder =>
             {
