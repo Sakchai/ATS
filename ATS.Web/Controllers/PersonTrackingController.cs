@@ -91,8 +91,13 @@ namespace ATS.Web.Controllers
                 TranDate = p.TranDate
             };
 
-            _logger.LogInformation($"Insert BuildingId:{p.BuildingId},NumberPass:{p.Total - p.Failed},NumberFail:{p.Failed},TranDate:{person.TranDate.ToLongDateString()}");
-            _personTrackingService.InsertPersonTracking(person);
+            if (lastPerson.Equals(person))
+                _logger.LogInformation($"Equal previous record BuildingId:{p.BuildingId},NumberPass:{p.Total - p.Failed},NumberFail:{p.Failed},TranDate:{person.TranDate.ToLongDateString()}");
+            else
+            {
+                _logger.LogInformation($"Insert BuildingId:{p.BuildingId},NumberPass:{p.Total - p.Failed},NumberFail:{p.Failed},TranDate:{person.TranDate.ToLongDateString()}");
+                _personTrackingService.InsertPersonTracking(person);
+            }
             return NoContent();
         }
 
@@ -100,7 +105,7 @@ namespace ATS.Web.Controllers
         [HttpPut]
         public ActionResult<PersonAccess> Put(PersonAccess p)
         {
-            if ((p.BuildingId == 0) || (p.NumberTotal == 0) || (p.NumberFail == 0) || (p.TranDate.Year == 1))
+            if ((p.BuildingId == 0) || (p.NumberTotal == 0) || (p.TranDate.Year == 1))
             {
                 return BadRequest();
             }

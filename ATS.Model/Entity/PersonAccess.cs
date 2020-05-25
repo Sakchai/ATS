@@ -2,10 +2,11 @@
 using LinqToDB.Mapping;
 using System;
 using System.Collections.Generic;
+using System.Security.Policy;
 
 namespace ATS.Model
 {
-    public partial class PersonAccess : BaseEntity
+    public partial class PersonAccess : BaseEntity, IEquatable<PersonAccess>
     {
         [PrimaryKey, NotNull, Identity]
         public override int Id { get; set; }
@@ -17,5 +18,23 @@ namespace ATS.Model
         public int RemainFail { get; set; }
         public int? BuildingId { get; set; }
 
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as PersonAccess);
+        }
+
+        public bool Equals(PersonAccess other)
+        {
+            return other != null &&
+                   NumberPass == other.NumberPass &&
+                   NumberFail == other.NumberFail &&
+                   NumberTotal == other.NumberTotal &&
+                   BuildingId == other.BuildingId;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(NumberPass, NumberFail, NumberTotal, BuildingId);
+        }
     }
 }
