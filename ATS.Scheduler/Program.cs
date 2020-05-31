@@ -12,34 +12,44 @@ namespace ATS.Scheduler
         static async System.Threading.Tasks.Task Main(string[] args)
         {
             bool useAPI = ConfigurationManager.AppSettings["UseAPI"].Equals("Y");
+            bool useFile = ConfigurationManager.AppSettings["UseFile"].Equals("Y");
 
-            if (!useAPI)
+            if (useFile)
             {
-                var builder = new ContainerBuilder();
-                builder.RegisterType<BaseDataProvider>().AsImplementedInterfaces().InstancePerLifetimeScope();
-                //data layer
-                builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerDependency();
-                builder.Register(context => context.Resolve<IDataProviderManager>().DataProvider).As<IATSDataProvider>().InstancePerDependency();
-
-                builder.RegisterType<ATSContext>().AsImplementedInterfaces().InstancePerLifetimeScope();
-
-                builder.RegisterGeneric(typeof(EntityRepository<>)).As(typeof(IRepository<>)).InstancePerLifetimeScope();
-
-                builder.RegisterType<PersonTrackingService>().As<IPersonTrackingService>().InstancePerLifetimeScope();
-
-                using (var container = builder.Build())
+                var personTracker = new PersonTrackerFile();
+                await personTracker.Create();
+            }
+            else
+            {
+                if (!useAPI)
                 {
-                    var personService = container.Resolve<IPersonTrackingService>();
+                    var builder = new ContainerBuilder();
+                    builder.RegisterType<BaseDataProvider>().AsImplementedInterfaces().InstancePerLifetimeScope();
+                    //data layer
+                    builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerDependency();
+                    builder.Register(context => context.Resolve<IDataProviderManager>().DataProvider).As<IATSDataProvider>().InstancePerDependency();
 
-                    var personTracker = new PersonTracker(container, personService);
+                    builder.RegisterType<ATSContext>().AsImplementedInterfaces().InstancePerLifetimeScope();
 
-                    personTracker.Create();
+                    builder.RegisterGeneric(typeof(EntityRepository<>)).As(typeof(IRepository<>)).InstancePerLifetimeScope();
+
+                    builder.RegisterType<PersonTrackingService>().As<IPersonTrackingService>().InstancePerLifetimeScope();
+
+                    using (var container = builder.Build())
+                    {
+                        var personService = container.Resolve<IPersonTrackingService>();
+
+                        var personTracker = new PersonTracker(container, personService);
+
+                        personTracker.Create();
+                    }
                 }
-            } else
-            {
-                var personTracker = new PersonTrackerAPI();
+                else
+                {
+                    var personTracker = new PersonTrackerAPI();
 
-                await personTracker.CreateV2Async();
+                    await personTracker.CreateV2Async();
+                }
             }
         }
 

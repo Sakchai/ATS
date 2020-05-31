@@ -56,38 +56,14 @@ namespace ATS.Web.Controllers
 
             var lastPerson = _personTrackingService.GetLastPersonTracking(p.BuildingId);
 
-            int remainFail;
-            int remainPass;
-            int remainTotal;
-            if (lastPerson != null)
-            {
-                if (p.Total > lastPerson.NumberTotal)
-                {
-                    remainTotal = p.Total - lastPerson.NumberTotal;
-                    remainFail = p.Failed - lastPerson.NumberFail;
-                    remainPass = p.Total - p.Failed - lastPerson.NumberPass; 
-                }
-                else
-                {
-                    remainTotal = p.Total;
-                    remainFail = p.Failed;
-                    remainPass = remainTotal - remainFail;
-                }
-            }
-            else
-            {
-                remainPass = p.Total - p.Failed;
-                remainFail = p.Failed;
-            }
-
             var person = new PersonAccess
             {
                 BuildingId = p.BuildingId,
                 NumberFail = p.Failed,
                 NumberPass = p.Total - p.Failed,
                 NumberTotal = p.Total,
-                RemainFail = remainFail,
-                RemainPass = remainPass,
+                RemainFail = p.Failed,
+                RemainPass = p.Total - p.Failed,
                 TranDate = p.TranDate
             };
 

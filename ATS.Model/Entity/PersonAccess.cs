@@ -26,15 +26,15 @@ namespace ATS.Model
         public bool Equals(PersonAccess other)
         {
             return other != null &&
-                   NumberPass == other.NumberPass &&
-                   NumberFail == other.NumberFail &&
+                   RemainPass == other.RemainPass &&
+                   RemainFail == other.RemainFail &&
                    NumberTotal == other.NumberTotal &&
                    BuildingId == other.BuildingId;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(NumberPass, NumberFail, NumberTotal, BuildingId);
+            return HashCode.Combine(RemainPass, RemainFail, NumberTotal, BuildingId);
         }
     }
 }
