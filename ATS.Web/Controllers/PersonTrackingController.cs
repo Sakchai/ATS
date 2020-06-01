@@ -49,7 +49,7 @@ namespace ATS.Web.Controllers
         [HttpPost]
         public IActionResult Post(PersonAccessDto p)
         {
-            if ((p.BuildingId == 0) || (p.Total == 0) || (p.TranDate.Year == 1))
+            if ((p.BuildingId == 0) || (p.TranDate.Year == 1))
             {
                 return BadRequest();
             }
@@ -67,7 +67,7 @@ namespace ATS.Web.Controllers
                 TranDate = p.TranDate
             };
 
-            if (lastPerson.Equals(person))
+            if ((lastPerson != null) && (lastPerson.Equals(person)))
                 _logger.LogWarning($"Equal previous record BuildingId:{p.BuildingId},NumberPass:{p.Total - p.Failed},NumberFail:{p.Failed},TranDate:{person.TranDate.ToLongDateString()}");
             else
             {

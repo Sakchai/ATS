@@ -37,7 +37,9 @@ namespace ATS.Scheduler
             try
             {
                 string sourceDirectory = ConfigurationManager.AppSettings["currentPath"];
+                log.Info($"sourceDirectory:{sourceDirectory}");
                 string archiveDirectory = ConfigurationManager.AppSettings["archivePath"];
+                log.Info($"archiveDirectory:{archiveDirectory}");
                 int buildingId = Int32.Parse(ConfigurationManager.AppSettings["buildingId"]);
                 var txtFiles = Directory.EnumerateFiles(sourceDirectory, "*.PNG", SearchOption.AllDirectories);
                 int passed = 0;
@@ -50,14 +52,15 @@ namespace ATS.Scheduler
                 foreach (string currentFile in txtFiles)
                 {
                     string fileName = currentFile.Substring(sourceDirectory.Length + 1);
+                    log.Info($"fileName:{fileName}");
                     startFile = (i == 0) ? Path.GetFileName(currentFile) : string.Empty;
                     endFile = Path.GetFileName(currentFile);
                     string[] data = Path.GetFileNameWithoutExtension(currentFile).Split('_');
                     creationDate = $"{data[0]}{data[1]}";
-                    if (float.Parse(data[2]) >= passedCC)
-                        passed++;
-                    else
+                    if (float.Parse(data[2]) > passedCC)
                         failed++;
+                    else
+                        passed++;
                     if (!Directory.Exists(archiveDirectory))
                         Directory.CreateDirectory(archiveDirectory);
                     string desFile = Path.Combine(archiveDirectory, fileName);
@@ -66,9 +69,14 @@ namespace ATS.Scheduler
                     Directory.Move(currentFile, desFile);
                     i++;
                 }
-                log.Info($"Start File:{startFile},End File:{endFile},No. of Passed: {passed}, No. of Failed: {failed}, Tran Date:{creationDate}.");
-                await CreateOrUpdatePersonAccessFileV3(buildingId, passed, failed, creationDate);
-                
+                if (!string.IsNullOrWhiteSpace(endFile))
+                {
+                    log.Info($"Start File:{startFile},End File:{endFile},No. of Passed: {passed}, No. of Failed: {failed}, Tran Date:{creationDate}.");
+                    await CreateOrUpdatePersonAccessFileV3(buildingId, passed, failed, creationDate);
+                } else
+                {
+                    log.Info($"Not found file.");
+                }
             }
             catch (Exception e)
             {
@@ -113,12 +121,14 @@ namespace ATS.Scheduler
  
         private async Task<Uri> CreatePersonAccessAsync(PersonAccessDto p)
         {
+            log.Info($"PersonAccess:{p}");
             string uri = $"{ConfigurationManager.AppSettings["BaseAddress"]}/api/PersonTracking";
+            log.Info($"uri:{uri}");
             HttpResponseMessage response = await client
                 .PostAsync(uri, new StringContent(JsonConvert.SerializeObject(p), Encoding.UTF8, "application/json"));
 
-            response.EnsureSuccessStatusCode();
-
+            log.Info($"response.EnsureSuccessStatusCode:{response.EnsureSuccessStatusCode()}");
+            log.Info($"response.Headers.Location:{response.Headers.Location}");
             // return URI of the created resource.
             return response.Headers.Location;
         }

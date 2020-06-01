@@ -39,6 +39,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="In\20200531_164639_38.6.PNG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="In\20200601_100700_38.4.PNG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="In\2020601_091312_36.6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="In\dfaBE4h7kQ.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
